@@ -291,11 +291,16 @@ fun getWeatherByHours(hoursList: List<HoursModel>, date: Int): List<HoursModel> 
 
 fun getCurrentDataByHour(hours: List<HoursModel>): HoursModel {
     val sdf = SimpleDateFormat("MM/dd/yyyy HH")
+    val sdfTime = SimpleDateFormat("HH")
     val epochNanoseconds = Instant.now().toEpochMilli()
     val firstDate = sdf.format(Date(epochNanoseconds))
     hours.forEach { item ->
-        if (firstDate == sdf.format(Date(item.getTimeEpoch().toLong() * 1000)))
+        if (firstDate == sdf.format(Date(item.getTimeEpoch().toLong() * 1000))) {
             return item
+        } else if (sdfTime.format(Date(epochNanoseconds)) == sdfTime.format(item.getTimeEpoch().toLong() * 1000)){
+            Log.d("TIME", "${sdfTime.format(Date(epochNanoseconds))} / ${sdfTime.format(item.getTimeEpoch().toLong() * 1000)}")
+            return item
+        }
     }
     return HoursModel(
         "empty",
