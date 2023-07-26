@@ -22,6 +22,7 @@ import com.android.volley.toolbox.Volley
 import com.zeoblocks.myweather.data.DaysModel
 import com.zeoblocks.myweather.data.HoursModel
 import com.zeoblocks.myweather.data.WeatherModel
+import com.zeoblocks.myweather.screens.DialogSearch
 import com.zeoblocks.myweather.screens.MainCard
 import com.zeoblocks.myweather.screens.TabLayout
 import com.zeoblocks.myweather.ui.theme.MyWeatherTheme
@@ -30,6 +31,7 @@ import java.io.File
 
 
 val API_KEY = getApiKey()
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,10 +44,19 @@ class MainActivity : ComponentActivity() {
                             "",
                             0,
                             "",
-                        "",
                             "",
-                        listOf()
-                    ))
+                            "",
+                            listOf()
+                        )
+                    )
+                }
+                val dialogState = remember {
+                    mutableStateOf(false)
+                }
+                if (dialogState.value){
+                    DialogSearch(dialogState, onSubmit = {
+                        getData(it, this, weatherModel)
+                    })
                 }
                 getData("Vladimir", this, weatherModel)
                 Image(
@@ -57,7 +68,14 @@ class MainActivity : ComponentActivity() {
                     contentScale = ContentScale.FillBounds
                 )
                 Column {
-                    MainCard(weatherModel = weatherModel)
+                    MainCard(
+                        weatherModel = weatherModel,
+                        onClickSync = {
+                            getData("Vladimir", this@MainActivity, weatherModel)
+                        },
+                        onClickSearch = {
+                            dialogState.value = true
+                        })
                     TabLayout(weatherModel = weatherModel)
                 }
             }
@@ -76,8 +94,7 @@ private fun getData(city: String, context: Context, weatherModel: MutableState<W
     val request = StringRequest(
         Request.Method.GET,
         url,
-        {
-            response ->
+        { response ->
             weatherModel.value = getWeatherModel(response)
         },
         {
@@ -140,7 +157,7 @@ private fun getWeatherModel(response: String): WeatherModel {
     )
 }
 
-private fun getApiKey(): String{
-    return ""
+private fun getApiKey(): String {
+    return "163f344b982545a1ac352310232107"
 }
 

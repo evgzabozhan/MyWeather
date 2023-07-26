@@ -12,13 +12,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -65,7 +69,7 @@ fun MainList(weatherModel: MutableState<WeatherModel>, selectedScreen: MutableSt
 }
 
 @Composable
-fun MainCard(weatherModel: MutableState<WeatherModel>) {
+fun MainCard(weatherModel: MutableState<WeatherModel>, onClickSync: () -> Unit, onClickSearch: () -> Unit) {
     Column(
         modifier = Modifier.padding(7.dp)
     ) {
@@ -119,7 +123,7 @@ fun MainCard(weatherModel: MutableState<WeatherModel>) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     IconButton(onClick = {
-
+                        onClickSearch.invoke()
                     }) {
                         Icon(
                             painter = painterResource(id = R.drawable.search),
@@ -128,7 +132,7 @@ fun MainCard(weatherModel: MutableState<WeatherModel>) {
                         )
                     }
                     IconButton(onClick = {
-
+                        onClickSync.invoke()
                     }) {
                         Icon(
                             painter = painterResource(id = R.drawable.sync),
@@ -268,6 +272,42 @@ fun Days(item: DaysModel, currentDay: MutableState<WeatherModel>) {
             )
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DialogSearch (dialogState: MutableState<Boolean>, onSubmit: (String) -> Unit) {
+    val dialogText = remember {
+        mutableStateOf("")
+    }
+    AlertDialog(onDismissRequest = {
+        dialogState.value = false
+    },
+        confirmButton = {
+            TextButton(onClick = {
+                onSubmit(dialogText.value)
+                dialogState.value = false
+            }) {
+                Text(text = "Подтвердить")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = {
+                dialogState.value = false
+            }) {
+                Text(text = "Отмена")
+            }
+        },
+        title = {
+            Column(Modifier.fillMaxWidth()) {
+                Text(text = "Введите название города: ")
+                TextField(value = dialogText.value, onValueChange = {
+                    dialogText.value = it
+                })
+            }
+
+        }
+    )
 }
 
 
